@@ -1,0 +1,27 @@
+.datepicker { position: absolute; border: 2px solid #417798; font-family: Arial; }
+
+.datepicker table { border-collapse:collapse; }
+.datepicker td { text-align: center; width: 20px; font-size: 11px; }
+.datepicker .head td { font-size: 13px; }
+.datepicker .wday td { background-color: #71A38D; color: #FFFFFF; font-size: 12px; }
+.datepicker .weekend { background-color: #E9B7B7; }
+.datepicker .today { background-color: #ff9; }
+
+
+.datepicker .prevyear,
+.datepicker .nextyear,
+.datepicker .prevmonth,
+.datepicker .nextmonth,
+.datepicker .day,
+.datepicker .gotoday
+{ cursor: pointer; }
+
+.datepicker .prevyear:hover,
+.datepicker .nextyear:hover,
+.datepicker .prevmonth:hover,
+.datepicker .nextmonth:hover,
+.datepicker .day:hover,
+.datepicker .gotoday:hover,
+.datepicker .picked
+{ color: red; }
+
