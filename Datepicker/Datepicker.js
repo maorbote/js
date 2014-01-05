@@ -1,13 +1,13 @@
 
 (function( window ) {
 var 
-    today = new Date(),
     target,
     picked,
     view,
     isMouseover,
     calyear,
     calmonth,
+    today = new Date(),
     lang = { day_of_week : ['Su','Mo','Tu','We','Th','Fr','Sa'], today : 'Today' },
     
     getElementOffset = function( el ) {
@@ -18,13 +18,13 @@ var
         } while ( el = el.offsetParent );
         return offset;
     },
-    hasClass = function(el, cn) {
+    hasClass = function( el, cn ) {
         return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1;
     },
     parseDateStr = function( str, delimiter ) {
         var date = new Date(), y, m, d;
         str = str.split(delimiter);
-        if (str.length == 3) {
+        if( str.length == 3 ) {
             y = parseInt(str[0]) || date.getFullYear();
             m = parseInt(str[1]) || date.getMonth() + 1;
             d = parseInt(str[2]) || date.getDate();
@@ -37,7 +37,7 @@ var
         };
     },
     getCalHead = function() {
-        return "\n" + '<tr class="head">'
+        return '<tr class="head">'
             + '<td class="prevyear">◄</td>'
             + '<td class="calyear" colspan="2">' + calyear + '</td>'
             + '<td class="nextyear">►</td>'
@@ -83,23 +83,23 @@ var
         return calbody;
     },
     drawCalTable = function() {
-        return '<table>' + getCalHead() + getCalBody()
-            + '\n' + '<tr><td class="gotoday" colspan="7">'
+        return "<table>\n" + getCalHead() + getCalBody()
+            + '<tr><td class="gotoday" colspan="7">'
             + lang.today + ' : '
             + today.getFullYear()
-            + '-' + today.getMonth() + 1
+            + '-' + ( today.getMonth() < 9 ? '0' : '' ) + ( today.getMonth() + 1 )
             + '-' + ( today.getDate() < 10 ? '0' : '' ) + today.getDate()
-            + '</td></tr>'
+            + "</td></tr>\n"
             + '</table>';
     },
     createView = function() {
         var div = document.createElement('div');
         div.className = 'datepicker';
         div.style.visibility = 'hidden';
-        div.onmouseover = function(e){
+        div.onmouseover = function(e) {
             isMouseover = true;
         }
-        div.onmouseout = function(e){
+        div.onmouseout = function(e) {
             isMouseover = false;
         }
         div.onclick = function(e) {
@@ -110,7 +110,14 @@ var
             }
         }
         div.draw = function() {
+            var offset = getElementOffset(target);
+            this.style.left = offset.left;
+            this.style.top = offset.top + target.offsetHeight;
+            this.style.visibility = 'visible';
             this.innerHTML = drawCalTable();
+        }
+        div.hide = function() {
+            this.style.visibility = 'hidden';
         }
         document.body.appendChild(div);
         view = div;
@@ -156,7 +163,11 @@ var
         view.draw();
     },
     triggerAction = function( el ) {
-        if( hasClass(el, 'prevmonth') ) {
+        if( hasClass(el, 'day') ) {
+            pickDay(el.innerHTML);
+        }else if( hasClass(el, 'gotoday') ) {
+            pickToday();
+        }else if( hasClass(el, 'prevmonth') ) {
             prevMonth();
         }else if( hasClass(el, 'nextmonth') ) {
             nextMonth();
@@ -164,27 +175,26 @@ var
             prevYear();
         }else if( hasClass(el, 'nextyear') ) {
             nextYear();
-        }else if( hasClass(el, 'day') ) {
-            pickDay(el.innerHTML);
-        }else if( hasClass(el, 'gotoday') ) {
-            pickToday();
         }
     },
+    bindTatget = function( tar ) {
+        target = tar;
+        picked = parseDateStr(tar.value, '-');
+        calyear = picked.year;
+        calmonth = picked.month;
+    }
     DatePicker = {
         bind : function( el_input ) {
             if( typeof el_input === 'string' ) {
                 el_input = document.getElementById(el_input);
             }
             if( !el_input || el_input.tagName != 'INPUT' ) return;
-            target = el_input;
-            picked = parseDateStr(el_input.value, '-');
-            calyear = picked.year;
-            calmonth = picked.month;
-            target.onfocus = function() {
-                DatePicker.bind(this);
+            bindTatget(el_input);
+            el_input.onclick = function() {
+                bindTatget(this);
                 DatePicker.show();
             }
-            target.onblur = function() {
+            el_input.onblur = function() {
                 if( !isMouseover ) {
                     DatePicker.hide();
                 }
@@ -199,15 +209,11 @@ var
             if( !view ) {
                 createView();
             }
-            var offset = getElementOffset(target);
-            view.style.left = offset.left;
-            view.style.top = offset.top + target.offsetHeight;
-            view.style.visibility = 'visible';
             view.draw();
             target.draw();
         },
         hide : function() {
-            view.style.visibility = 'hidden';
+            view.hide();
         },
         lang : lang
     };
